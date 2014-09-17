@@ -1,0 +1,264 @@
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+\title{Validation of the CMS Hadron Calorimeter Phase I Data Acquisition System}
+\author{Andrew Whitbeck, Ken Call, Jim Hirschauer}
+
+\begin{document}
+\maketitle
+
+\abstract{An overview of upgrades to the CMS Hadron Calorimeter (HCal) data acquisition system will be presented. 
+Design changes to both the frontend and backend electronics will be descussed.  Performance of pro  duction backend
+electronics and prototype frontend electronics will be presented.  Results from integration tests from both bench top
+and beam test experiments will be presented.  }
+
+\section{Introduction}
+
+CMS is a great undertaking and the Hadronic Calorimeter (HCal) plays a crucial role in the physics program
+of CMS.  blah blah blah ...
+
+This note is organized as follows.  Section~\ref{overview} will discuss the current CMS hadronic calorimeter 
+and the design components that will be upgraded as well as the motivations for these upgrades.   
+Sections~\ref{frontend} and~\ref{backend} will describe the upgraded readout electronics, comparing and
+contrasting them to the existing electronics.  Section~\ref{results} will present results from bench top and beam 
+integration tests which verify the functionality of different key desing components.  Finally, Section~\ref{conclusion}
+will summarize the successes of the project and work yet to be done. 
+
+\section{Overview of Upgrades}
+
+The CMS Hadronic Calorimeter consists of four major subdetectors, the barrel region ($|\eta|<x.xx$) , 
+the endcap region ($x.xx|\eta|<3.0$), the forward region ($3.0<|\eta|<5.0$), and the outer region.   
+During the last portion of LHC run I, these subdetectors used three separate technologies.  
+
+The barrel and endcap regions consisted of brass absorber and organic plastic scintillators as the active 
+material.  The photodetectors collecting sampled light were hybrid photodiodes (HPD).  
+Except in regions were towers overlapped, 
+all longitudinal segments were optically summed before being read out.  
+
+In the forward calorimeter (HF), the abosber material is steel and the active material is a set of long and 
+short quartz fibers running parrellel to the beam line.  The long and short segment allow for both hadronic
+and electromagnetic components of showers to be distinguished.  The quartz fibers are optically coupled 
+to photomultiplier tubes (PMT).  
+
+Existing readout electronics consist of frontend electronic which reside either on the detector (HB, HE, HO)
+or in electronics racks just next to the detector (HF).  The design principles for the readout is the same for
+all subdetectors although due to physical constraints, the implementation is slightly different.  The frontend
+electronics consist of a custom Application Specific Integrated Circuit (ASIC) which digitizes analog signals
+from the photodetectors.  This ASIC is known as the Charge (Q) Integrator and Encoder (QIE) is an ADC which
+can integrate at 40 Mhz which a dynamic range that spans XXX orders of magnitude of integrated charge 
+while minimizing the quantization error \ref{QIE}.   Digitized signals from the QIE are then formatted by a
+second ASIC and routed to the backend electronics. 
+
+%%% describe the CCM
+
+In the backend racks, data is recieved by the HCal Trigger and Readout board.  This is a VME style board buffers data and communicates with the global calorimeter trigger.  Trigger primitives are computed using a set of lookup tables to convert charge into energy.  Once a bunch crossing is accepted by the level-1 trigger system, the data is finally sent to the Data Concentrator Card which builds events and forwards these to the central DAQ system for full reconstruction.
+
+\subsection{Design Motivations for the Phase I Upgrade}
+
+In the barrel endcap region where HPDs are utilized, the effect of the strong magnetic field has been found
+to have a dramatic effect on the long term performance of the HPDs.   Figure~\ref{} shows the dispersion of 
+HPD gain as a function of time as a result of prolonged exposure to magnetic fields.  The HPDs have has
+been found to discharge causing large anomalous signal to be readout.  These effect were more prominently 
+notice in the HO region where the magnetic field is large due to its proximity with the steel return yolk.  As a 
+result, Silicon Photomultipliers (SiPM) have been install and operated in HO since, ???.  Replacing the HPDs
+in the barrel and endcap subdetectors will not only remedy the performance loss, but will also allow for
+better resistance to radiation exposure due to the higher gain of the SiPMs and increased longitudinal
+due to the reduced size of SiPMs.  However, this will dramatically increase the number of channels which are 
+readout.  
+
+In the forward region muons or shower punch through are know to produce high rates of anomalous signals 
+which arrive out of time from shower signals.  These signals arise from high energy particles moving through
+the borosilicate glass covering the photocathode of the PMT and producing Cerenkov light.  Due to the bunch 
+structure of the LHC run I, 50 ns spacing, CMS was able to tune the charge integration window in order to move 
+almost all of these anomalous signals into the previous bunch crossing.  Otherwise, these signal would present 
+a major challenge for both triggering and reconstruction.  Aside from being out of time, these signal are also 
+distinct from signals from particle showers in how the photons are distributed on the surface of the photocathode.
+Thus, making use of the mutlianode PMTs, anomalous signals can be rejected based on how assymetric the 
+signals on different pairs of anodes are.  This, however, requires that the adapter boards within the PMT boxes 
+which electrically sum the four anodes will need to be adapted such that two pairs of anodes are electrically 
+summed.  This further requires that the number of channels readout in the HF subdetector double.  
+
+\subsection{Installation Schedule}
+
+Upgrades of the PMT in HF have already been successfully completed during the ongoing long shutdown.
+Cabling for the dual anode readout has been laid out.  Backend electronics are currenly being produced and tested
+at CERN with installation to be completed by the end of LS1.  Adapter boards and frontend electronics
+will be installed during the year end technical stop (YETS) between the years 2015 and 2016.  Prototype frontend
+electronics have been produced and preproduction boards are scheduled to be produced by the end of the
+year 2014.  This schedule ensures that the backend electronics will already have been commissioned before 
+the frontend electronics are installed relieving the work load during the start of collisions in the year 2016.  
+
+The barrel and endcap frontend electronics require that the detector be opened in order to install.  As a results, 
+these components are not scheduled to be installed until the extended YETS of the year 2017.    As such, prototype 
+frontend electronics are not scheduled to be built before 2015.  However, since the design is largely the same 
+as for the HF subdetector, most of the design validation can be completed long before then using the HF components.  
+
+
+
+\section{Frontend Electronics}
+
+In each of the individual subdetectors, the frontend electronics are grouped into sets of n QIE cards which 
+house different numbers of QIEs each.  For the barrel and endcap, each group resides in a readout box (RBX),
+which is an aluminum housing containing cooling mechanics and a custom backplane for power and signal 
+distribution.  In HF, each group will reside in a eurostyle crate with a custom backplane.  In each of the RBXs and
+HF crates, there will also exist an ngCCM and a calibration card.  Table~\ref{table:frontendComponents} shows how many QIE 
+cards and channels will be readout per RBX and HF crate. 
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+Component & HF & HB & HE \\
+\hline \hline
+QIE version & 10 & 11 & 11 \\ \hline
+QIEs & 24 & 12 & 12 \\ \hline
+QIE cards per RBX/crate & 12 & 16 & 16 \\ \hline 
+\end{tabular}
+\caption{Tabulation of different components which will be used in each of the different HCal subsystems.}
+\label{table:frontendComponents}
+\end{center}
+\end{table}
+
+\subsection{Charge Integrator and Encoder ASIC}
+
+The new QIE ASIC will include larger dynamic range, a TDC, and programmable monitoring capabilities.  
+Separate versions will be used for HF and HB/HE subsystems, see Table~\ref{table:frontendComponents} for
+details.  The TDC has a 6-bit encoding which is readout over 3 double data rate (DDR) pins.  The ADC has an 8-bit
+encoding and is read out over 4 DDRs.  Each QIE has the same set of range selector and integrator duplicated 
+four times to provide deadtimeless integration.  Each of these subcircuits has a Cap-ID accosiated with it which is 
+readout with a single DDR.  Certain functionality of the QIE is programmable, such as the input pedestal DAC, 
+through a programmable 64 bit shift register.  
+
+\subsection{QIE Card}
+
+The QIE card will contain the upgraded QIE ASICs.  Each QIE card will digitize and format data from 12 (24)
+channels for the HB/HE (HF) subsystem.  The data is captured by a commercial Microsemi Igloo2 FPGA.  
+Once captured, the TDC discriminant can be used to compute falling edge TDC.  The ADC and rising edge
+TDC information for 6 separate channels is formatted into a 12 byte data frame and the 12 falling edge TDC 
+measurements are formed into a separate 12 byte frame.  These frames are sent to 3 separate serializers 
+which are located on the Igloo2.  Serialized data is then sent, via a Versatile Tranceiver (VTTx)~\ref{VTTXref}, 
+to a $\mu$HTR at 5.8 Gbps.  Each VTTx module can drive 2 fibers.  In total, there are 2 (3) VTTx modules 
+on each QIE card.  
+
+Power distribution on the QIE card is handle using a set of custom DC/DC converters... something, is this 
+really necessary.
+
+\subsection{Next-Generation Clock, Control, and Monitoring Card}
+
+The ngCCM card will manage the clock signal, slow and fast control signals, and monitoring functionality.  One 
+ngCCM will manage an entire RBX (crate) in the HB/HE (HF) subsystems.  This single card will forward the clock
+to each QIE card within the RBX (crate) as well as $I^2C$ signal and reset signals.  As such, all control and 
+monitoring is facilitated by the ngCCM.  
+
+\section{Backend Electronics}
+
+The backend electronics for the HCal systems will reside in the service cavern.  All backend electronics will
+reside in commercial Vadatek $\mu$TCA crates.  These crates will be power by... A crate will consiste of 12 
+$\mu$HTRs, an AMC13, and a $\mu$TCA Control Hub (MCH).  Except for the latter, these devices were custom
+designed for data acquisition in particle physics.
+
+\subsection{$\mu$HTR}
+
+The $\mu$HTR two main purposes, receiving and buffering data before forwarding data to the AMC13 and communicating trigger primitives to the global calorimeter trigger system.  
+
+Data is received from the frontend via a fiber bundle into an Avago AFBR-820BEPZ PPOD optical receiver.  
+% show figure 6.3 from HCal upgrade TDR
+These optical receivers are capable of accepting 12 fibers, a single QIE card pack or a pair of HF QIE cards (???)
+and are capable of operating up to 10 Gbps
+
+Electrical signals from the PPOD recievers are deserialized using a Xilinx Virtex 6-series FPGA.  The data is then
+synchronized and trigger primitives are computed for the level-1 trigger system.  The data is then pipelined 
+until a level-1 accept signal is received.  
+
+An SDRAM buffer is also included to allow of latency in the back FPGA.  This buffer is 64 MB which is sufficient
+for a 100 ms latency at the fully DAQ rate, x.xx hz.  
+
+IPBus communication with both the front and back FPGA is enabled via the GbE line.  This allows for register 
+control.  
+
+Figure~\ref{} shows the block diagram for the  $\mu$HTR.  
+
+\subsection{AMC13}
+
+\section{Setup}
+
+\subsection{LED tests}
+
+\subsection{Internal charge injection tests}
+
+\section{Results}
+
+A suite of test have been carried out to validate the design and performance of the HF frontend electronics.  
+These tests have been carried out using both a bench top setup and particle beam tests using a mock HF 
+calorimeter.
+
+\subsection{Slow control communication}
+
+The QIE ASICS and IGLOO2 FPGA are intended to be configured and monitored via I$^2$C buses.  The
+bridge FPGA acts as a mux for this communication and routes the signals to the appropriate location.  
+Users can select between either of the 2 IGLOO2 FPGAs or between any of the 4 chains of 6 QIEs.  details 
+on the list of registers that can be written to and read from as well as the details on the communication
+protocols can be found in Ref.~\cite{BridgeSpecs}.  
+
+To test this functionality and robustness of the I$^2$C communication with both the IGLOO2 registers and the
+QIE shift registers, both systematic and random values were written to register and read back over an extended 
+period of time.  ... Show results of this test.
+
+\subsection{QIE shift registers}
+
+In order to verify that the shift registers for the QIEs are being properly written to and read from by the QIEs, 
+a number of test which result in predictable QIE behavior were carried out.  
+
+Fixed range mode test.  QIE pedestal DAC.  Anymore?
+
+\subsection{TDC validation}
+
+\subsection{ADC validation}
+
+\subsection{QIE cross talk}
+
+\subsection{QIE clock phase}
+
+\subsection{JTAG programming over backplane}
+
+\subsection{Double pulses}
+
+\subsection{$\mu$HTR optical link BERT}
+
+\end{document}
